@@ -59,7 +59,7 @@ namespace HNGStage2.Repository
                 person = await _db.Persons.FirstOrDefaultAsync(x => x.Id.Equals(id));
                 return person;
             }
-            person = await _db.Persons.FirstOrDefaultAsync(x => x.Name.ToLower().Contains(user_id));
+             person = await _db.Persons.FirstOrDefaultAsync(x => x.Name.ToLower().Contains(user_id));
             
             return person;
         }
