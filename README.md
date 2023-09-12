@@ -7,8 +7,20 @@ A simple REST API capable of CRUD operations on a "person" resource, interfacing
 - [Installation](#installation)
 - [Usage](#Usage)
 
-## Prerequisites
+## Available Endpoints
 
+| Endpoint                | Description                                | HTTP Methods |
+|-------------------------|--------------------------------------------|--------------|
+| `/api/`                 | Creates a new user.                        | POST         |
+| `/api/{user_id}`        | Update a user.                             | PUT          |
+| `/api/{user_id}`        | Fetches a user.                            | GET          |
+| `/api/{user_id}`        | Deletes a user.                            | DELETE       |
+
+## API Documentation
+
+For detailed API documentation, including endpoint descriptions, request/response examples, and more, please refer to the [API Documentation](./Documentation.md) file.
+
+## Prerequisites
 Before you begin, ensure you have met the following requirements:
 
 - [.NET Core SDK](https://dotnet.microsoft.com/download/dotnet) (version 4.8 or higher)
