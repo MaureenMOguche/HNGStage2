@@ -1,7 +1,9 @@
-﻿using HNGStage2.Models;
+﻿using Azure;
+using HNGStage2.Models;
 using HNGStage2.Repository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.ComponentModel.DataAnnotations;
 
 namespace HNGStage2.Controllers
@@ -17,9 +19,9 @@ namespace HNGStage2.Controllers
             _personRepository = personRepository;
         }
 
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
         [HttpGet("{user_id}")]
         public async Task<IActionResult> GetPerson(string user_id) 
         {
@@ -29,7 +31,7 @@ namespace HNGStage2.Controllers
             {
                 response.StatusCode = StatusCodes.Status400BadRequest;
                 response.Message = "user_id cannot be null";
-                return BadRequest(response);
+                return StatusCode(StatusCodes.Status400BadRequest, response);
             }
 
             var person = await _personRepository.GetPerson(user_id);
@@ -38,16 +40,18 @@ namespace HNGStage2.Controllers
             {
                 response.StatusCode = StatusCodes.Status404NotFound;
                 response.Message = "person not found";
-                return NotFound(response);
+                return StatusCode(StatusCodes.Status404NotFound, response);
             }
 
-            return Ok(person);
-
+            response.StatusCode = StatusCodes.Status200OK;
+            response.Data = person;
+            response.Message = "successfully retrieved person";
+            return StatusCode(StatusCodes.Status200OK, response);
         }
 
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
         [HttpPost]
         public async Task<IActionResult> AddPerson([FromBody] PersonDto addPerson)
         {
@@ -58,18 +62,19 @@ namespace HNGStage2.Controllers
             }
 
             var result = await _personRepository.AddPerson(addPerson);
-            if (result > 0)
+            if (result != null)
             {
                 response.StatusCode = StatusCodes.Status201Created;
                 response.Message = "Successfully added person";
-                return StatusCode(StatusCodes.Status200OK, response);
+                response.Data = result;
+                return StatusCode(StatusCodes.Status201Created, response);
             }
          
             return StatusCode(StatusCodes.Status500InternalServerError, "failed to add person");
         }
 
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         [HttpPut("{user_id}")]
         public async Task<IActionResult> UpdatePerson(string user_id, [FromBody] PersonDto updatePerson)
         {
@@ -88,20 +93,22 @@ namespace HNGStage2.Controllers
             }
 
             person.Name = updatePerson.Name;
-            var result = await _personRepository.UpdatePerson(person);
-            if (result > 0)
-            {
-                response.StatusCode = StatusCodes.Status201Created;
-                response.Message = "Successfully updated person";
-                return StatusCode(StatusCodes.Status201Created, response);
-            }
 
-            return StatusCode(StatusCodes.Status500InternalServerError, "failed to upate person");
+            var result = await _personRepository.UpdatePerson(person);
+            if (result != null)
+            {
+                response.StatusCode = StatusCodes.Status200OK;
+                response.Message = "Successfully updated person";
+                response.Data = result;
+                return StatusCode(StatusCodes.Status200OK, response);
+            }
+            response.StatusCode = StatusCodes.Status500InternalServerError;
+            return StatusCode(StatusCodes.Status500InternalServerError, response);
         }
 
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
         [HttpDelete("{user_id}")]
         public async Task<IActionResult> Delete(string user_id)
         {

@@ -14,14 +14,16 @@ namespace HNGStage2.Repository
             _db = db;
         }
 
-        public async Task<int> AddPerson(PersonDto person)
+        public async Task<Person?> AddPerson(PersonDto person)
         {
             Person newPerson = new Person()
             {
                 Name = person.Name,
             };
-            await _db.Persons.AddAsync(newPerson);
-            return await _db.SaveChangesAsync();
+            var result = await _db.Persons.AddAsync(newPerson);
+            var res = await _db.SaveChangesAsync();
+            
+            return result.Entity;
         }
 
         public async Task<int> DeletePerson(string userId)
@@ -59,16 +61,17 @@ namespace HNGStage2.Repository
                 person = await _db.Persons.FirstOrDefaultAsync(x => x.Id.Equals(id));
                 return person;
             }
-             person = await _db.Persons.FirstOrDefaultAsync(x => x.Name.ToLower().Contains(user_id));
+             person = await _db.Persons.FirstOrDefaultAsync(x => x.Name.ToLower().Contains(user_id.ToLower()));
             
             return person;
         }
 
-        public async Task<int> UpdatePerson(Person person)
+        public async Task<Person?> UpdatePerson(Person person)
         {
             
-            _db.Update(person);
-            return await _db.SaveChangesAsync();
+            var result = _db.Update(person);
+            var res = await _db.SaveChangesAsync();
+            return result.Entity;
         }
     }
 }
