@@ -41,11 +41,8 @@ Below is a list of the available endpoints in this API, along with their descrip
 
 - **Request Format**:
   - For GET requests:
-    ```json
-    {
-      "name": "Maureen",
-    }
-    ```
+    ```user_id: "Maureen"```
+
 - **Response Format**:
   - Status Code: 200 OK
   - Response Body:
@@ -73,6 +70,7 @@ Below is a list of the available endpoints in this API, along with their descrip
   - For PUT requests:
 
    ```user_id: "Maureen"```
+    
     ```json
     {
       "name": "Johnson",
